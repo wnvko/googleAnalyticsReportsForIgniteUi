@@ -20,7 +20,7 @@ export class AppComponent {
   public endDate: Date;
   public selected: string;
   public reports: string[] = ['Frameworks', 'Project Types', 'Templates'];
-  public data: any[];
+  public data: FrameworkData[];
 
   constructor(private googleApiService: GoogleApiService) {
     this.googleApiService.afterInit.subscribe(this.onInit);
@@ -81,7 +81,7 @@ export class AppComponent {
   private onLoadData = (data) => {
     switch (this.selected) {
       case this.reports[0]:
-        this.showFrameworksData(data);
+        this.data = this.showFrameworksData(data.result.reports);
         break;
       case this.reports[1]:
         break;
@@ -123,7 +123,10 @@ export class AppComponent {
       dimensionFilterClauses: dimensionFilterClausesForWizard
     };
 
-    const dimensionsForEvents: Dimension[] = [{name: 'ga:dimension1'}];
+    const dimensionsForEvents: Dimension[] = [
+      {name: 'ga:dimension1'},
+      {name: 'ga:eventCategory'}
+    ];
     const reportRequestForEvents: ReportRequest = {
       viewId: this.VIEW_ID,
       dateRanges: [dateRange],
@@ -137,47 +140,88 @@ export class AppComponent {
     ];
   }
 
-  private showFrameworksData = (data) => {
-    const wizardResults: [any] = data.result.reports[0].data.rows;
-    const chartData: any[] = [];
-    for (const result of wizardResults) {
-      chartData.push({
-        Framework: result.dimensions[1].substring(11),
-        TotalEvents: parseInt(result.metrics[0].values[0])
+  private showFrameworksData = (reports) => {
+    const frameworksData: FrameworkData[] = this.initializeFrameworksData();
+    for (const report of reports) {
+      if (report.columnHeader.dimensions.includes('ga:eventLabel')) {
+        this.getFrameworkDataForWizard(report, frameworksData);
+      }
+
+      if (report.columnHeader.dimensions.includes('ga:dimension1')) {
+        this.getFrameworkDataForEvents(report, frameworksData);
+      }
+    }
+    return frameworksData;
+  }
+
+  private initializeFrameworksData(): FrameworkData[] {
+    const frameworksData: FrameworkData[] = [];
+    frameworksData.push({
+      frameworkName: 'Angular',
+      totalEvents: 0,
+      commands: []
+    });
+    frameworksData.push({
+      frameworkName: 'jQuery',
+      totalEvents: 0,
+      commands: []
+    });
+    frameworksData.push({
+      frameworkName: 'React',
+      totalEvents: 0,
+      commands: []
+    });
+    return frameworksData;
+  }
+
+  private getFrameworkDataForWizard(data: any, frameworksData: FrameworkData[]): FrameworkData[] {
+    for (const row of data.data.rows) {
+      const frameworkName: string = row.dimensions[1].substring(11);
+      const frameworkData: FrameworkData = frameworksData.find((item: FrameworkData) => {
+        return item.frameworkName.toLowerCase() === frameworkName.toLowerCase();
+      });
+      if (!frameworkData) {
+        continue;
+      }
+      const totalEvents: number = parseInt(row.metrics[0].values[0]);
+      frameworkData.totalEvents += totalEvents;
+      frameworkData.commands.push({
+        name: 'ig wizard',
+        totalEvents
       });
     }
 
-    const otherResults: [any] = data.result.reports[1].data.rows;
-    let angular = 0;
-    let jquery = 0;
-    let react = 0;
-    for (const result of otherResults) {
-      switch (result.dimensions[0]) {
-        case 'angular':
-          angular += parseInt(result.metrics[0].values[0]);
-          break;
-        case 'jquery':
-          jquery += parseInt(result.metrics[0].values[0]);
-          break;
-        case 'react':
-          react += parseInt(result.metrics[0].values[0]);
-          break;
-      }
-    }
-
-    for (const row of chartData) {
-      if (row.Framework.toLowerCase() === 'angular') {
-        row.TotalEvents += angular;
-        angular = row.TotalEvents;
-      } else if (row.Framework.toLowerCase() === 'jquery') {
-        row.TotalEvents += jquery;
-        jquery = row.TotalEvents;
-      } else if (row.Framework.toLowerCase() === 'react') {
-        row.TotalEvents += react;
-        react = row.TotalEvents;
-      }
-    }
-
-    this.data = chartData;
+    return frameworksData;
   }
+
+  private getFrameworkDataForEvents(data: any, frameworksData: FrameworkData[]): FrameworkData[] {
+    for (const row of data.data.rows) {
+      const frameworkName: string = row.dimensions[0];
+      const frameworkData: FrameworkData = frameworksData.find((item: FrameworkData) => {
+        return item.frameworkName.toLowerCase() === frameworkName.toLowerCase();
+      });
+      if (!frameworkData) {
+        continue;
+      }
+      const totalEvents: number = parseInt(row.metrics[0].values[0]);
+      frameworkData.totalEvents += totalEvents;
+      frameworkData.commands.push({
+        name: row.dimensions[1],
+        totalEvents
+      });
+    }
+
+    return frameworksData;
+  }
+}
+
+interface FrameworkData {
+  frameworkName: string;
+  totalEvents: number;
+  commands: Command[];
+}
+
+interface Command {
+  name: string;
+  totalEvents: number;
 }

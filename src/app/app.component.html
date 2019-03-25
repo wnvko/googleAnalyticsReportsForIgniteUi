@@ -1,9 +1,6 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-</div>
+<h1>
+  For developers only. No design, sorry!!!
+</h1>
 
 <button igxButton="outlined" *ngIf="!loggedIn" (click)="start()">Log in</button>
 <div *ngIf="loggedIn">
@@ -18,15 +15,15 @@
   <div *ngIf="data">
     <igx-tabs>
       <igx-tabs-group label="Chart">
-        <igx-pie-chart [dataSource]="data" width="300px" height="300px" labelMemberPath="Framework"
-          valueMemberPath="TotalEvents" [legend]="legend" othersCategoryThreshold="1">
+        <igx-pie-chart [dataSource]="data" width="300px" height="300px" labelMemberPath="frameworkName"
+          valueMemberPath="totalEvents" [legend]="legend" othersCategoryThreshold="1">
         </igx-pie-chart>
         <igx-item-legend #legend height="100px" width="100px">
         </igx-item-legend>
       </igx-tabs-group>
       <igx-tabs-group label="Table">
         <igx-hierarchical-grid #hierarchicalGrid [data]="data" [autoGenerate]="true" [width]="'400px'">
-          <igx-row-island [key]="'Command'" [autoGenerate]="true">
+          <igx-row-island [key]="'commands'" [autoGenerate]="true">
           </igx-row-island>
         </igx-hierarchical-grid>
       </igx-tabs-group>
