@@ -12,17 +12,34 @@
     </igx-select-item>
   </igx-select>
   <button igxButton="outlined" (click)="loadData()">Load data</button>
-  <div *ngIf="data">
+  <div *ngIf="frameworksData">
     <igx-tabs>
       <igx-tabs-group label="Chart">
-        <igx-pie-chart [dataSource]="data" width="300px" height="300px" labelMemberPath="frameworkName"
+        <igx-pie-chart [dataSource]="frameworksData" width="300px" height="300px" labelMemberPath="frameworkName"
           valueMemberPath="totalEvents" [legend]="legend" othersCategoryThreshold="1">
         </igx-pie-chart>
         <igx-item-legend #legend height="100px" width="100px">
         </igx-item-legend>
       </igx-tabs-group>
       <igx-tabs-group label="Table">
-        <igx-hierarchical-grid #hierarchicalGrid [data]="data" [autoGenerate]="true" [width]="'400px'">
+        <igx-hierarchical-grid #hierarchicalGrid [data]="frameworksData" [autoGenerate]="true" [width]="'400px'">
+          <igx-row-island [key]="'commands'" [autoGenerate]="true">
+          </igx-row-island>
+        </igx-hierarchical-grid>
+      </igx-tabs-group>
+    </igx-tabs>
+  </div>
+  <div *ngIf="projectTypesData">
+    <igx-tabs>
+      <igx-tabs-group label="Chart">
+        <igx-pie-chart [dataSource]="projectTypesData" width="300px" height="300px" labelMemberPath="projectType"
+          valueMemberPath="totalEvents" [legend]="legend" othersCategoryThreshold="1">
+        </igx-pie-chart>
+        <igx-item-legend #legend height="100px" width="100px">
+        </igx-item-legend>
+      </igx-tabs-group>
+      <igx-tabs-group label="Table">
+        <igx-hierarchical-grid #hierarchicalGrid [data]="projectTypesData" [autoGenerate]="true" [width]="'400px'">
           <igx-row-island [key]="'commands'" [autoGenerate]="true">
           </igx-row-island>
         </igx-hierarchical-grid>
