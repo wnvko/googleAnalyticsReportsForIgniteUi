@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # GaReport
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.1.
@@ -25,3 +26,6 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+=======
+# googleAnalyticsReportsForIgniteUi
+>>>>>>> a94e664e0754d84a5bef58b3991b1a2e0fc2b1f2
