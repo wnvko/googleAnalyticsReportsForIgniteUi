@@ -22,6 +22,7 @@ export class AppComponent {
   public reports: string[] = ['Frameworks', 'Project Types', 'Templates'];
   public frameworksData: FrameworkData[];
   public projectTypesData: ProjectTypeData[];
+  public templatesData: TemplateData[];
 
   constructor(private googleApiService: GoogleApiService) {
     this.googleApiService.afterInit.subscribe(this.onInit);
@@ -80,6 +81,9 @@ export class AppComponent {
    * Visualizes loaded data
    */
   private onLoadData = (data) => {
+    this.frameworksData = null;
+    this.projectTypesData = null;
+    this.templatesData = null;
     switch (this.selected) {
       case this.reports[0]:
         this.frameworksData = this.getFrameworksData(data.result.reports);
@@ -88,6 +92,7 @@ export class AppComponent {
         this.projectTypesData = this.getProjectsTypeData(data.result.reports);
         break;
       case this.reports[2]:
+        this.templatesData = this.getTemplatesData(data.result.reports);
         break;
     }
   }
@@ -98,6 +103,8 @@ export class AppComponent {
         return this.generateFrameworksReportRequests();
       case 'project types':
         return this.generateProjectTypesReportRequests();
+      case 'templates':
+        return this.generateTemplatesReportRequests();
     }
   }
 
@@ -185,6 +192,35 @@ export class AppComponent {
       reportRequestForWizard,
       reportRequestForEvents
     ];
+  }
+
+  private generateTemplatesReportRequests(): ReportRequest[] {
+    const dateRange: DateRange = {
+      startDate: this.startDate.toISOString().substring(0, 10),
+      endDate: this.endDate.toISOString().substring(0, 10)
+    };
+    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
+    const dimensionsForWizard: Dimension[] = [
+      {name: 'ga:eventLabel'},
+      {name: 'ga:eventAction'}
+    ];
+    const filtersForWizard: Filter[] = [
+      {
+          dimensionName: 'ga:eventLabel',
+          operator: 'BEGINS_WITH',
+          expressions: ['Choose project template:']
+      }
+    ];
+    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters: filtersForWizard}];
+    const reportRequestForWizard: ReportRequest = {
+      viewId: this.VIEW_ID,
+      dateRanges: [dateRange],
+      metrics,
+      dimensions: dimensionsForWizard,
+      dimensionFilterClauses: dimensionFilterClausesForWizard
+    };
+
+    return [reportRequestForWizard];
   }
 
   private getFrameworksData = (reports): FrameworkData[] => {
@@ -372,6 +408,77 @@ export class AppComponent {
 
     return longTypeName;
   }
+
+  private getTemplatesData = (reports): TemplateData[] => {
+    const templatesData: TemplateData[] = this.initializeTemplatesData();
+    for (const report of reports) {
+      if (report.columnHeader.dimensions.includes('ga:eventLabel')) {
+        this.getTemplatesDataForWizard(report, templatesData);
+      }
+    }
+    return templatesData;
+  }
+
+  private initializeTemplatesData(): TemplateData[] {
+    const templatesData: TemplateData[] = [];
+    templatesData.push({
+      templateName: 'empty',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'base',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'Empty Project',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'Default side navigation',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'Side navigation + login',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'jquery with Javascript',
+      totalEvents: 0,
+      commands: []
+    });
+    templatesData.push({
+      templateName: 'Default top navigation',
+      totalEvents: 0,
+      commands: []
+    });
+    return templatesData;
+  }
+
+  private getTemplatesDataForWizard(data: any, projectsTypeData: TemplateData[]): TemplateData[] {
+    for (const row of data.data.rows) {
+      const fullName: string = row.dimensions[1];
+      const template: string = fullName.substring(fullName.indexOf(':') + 2);
+      const templateData: TemplateData = projectsTypeData.find((item: TemplateData) => {
+        return item.templateName.toLowerCase() === template.toLowerCase();
+      });
+      if (!templateData) {
+        continue;
+      }
+      const totalEvents: number = parseInt(row.metrics[0].values[0]);
+      templateData.totalEvents += totalEvents;
+      templateData.commands.push({
+        name: 'ig wizard',
+        totalEvents
+      });
+    }
+
+    return projectsTypeData;
+  }
 }
 
 interface Command {
@@ -387,6 +494,12 @@ interface FrameworkData {
 
 interface ProjectTypeData {
   projectType: string;
+  totalEvents: number;
+  commands: Command[];
+}
+
+interface TemplateData {
+  templateName: string;
   totalEvents: number;
   commands: Command[];
 }
