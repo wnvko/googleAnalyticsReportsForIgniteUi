@@ -1,7 +1,7 @@
 <igx-date-picker [(ngModel)]="startDate"></igx-date-picker>
 <igx-date-picker [(ngModel)]="endDate"></igx-date-picker>
 <igx-select [(ngModel)]="selected">
-  <igx-select-item *ngFor="let type of reports" [value]="type">
+  <igx-select-item *ngFor="let type of reportsTypes" [value]="type">
     {{type}}
   </igx-select-item>
 </igx-select>

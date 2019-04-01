@@ -2,6 +2,12 @@ import { Component } from '@angular/core';
 import { ReportRequest, DateRange, Metric, Dimension, Filter, DimensionFilterClause } from '../models/index';
 import { DataService } from '../services/data.service';
 
+enum ReportType {
+  Frameworks = 'Frameworks',
+  ProjectTypes = 'Project Types',
+  Templates = 'Templates'
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -12,8 +18,8 @@ export class DashboardComponent {
   public loggedIn = false;
   public startDate: Date;
   public endDate: Date;
-  public selected: string;
-  public reports: string[] = ['Frameworks', 'Project Types', 'Templates'];
+  public selected: ReportType;
+  public reportsTypes: string[] = [ReportType.Frameworks, ReportType.ProjectTypes, ReportType.Templates];
   public frameworksData: FrameworkData[];
   public projectTypesData: ProjectTypeData[];
   public templatesData: TemplateData[];
@@ -24,14 +30,14 @@ export class DashboardComponent {
   ) {
     this.dataLoadService.onDataLoaded.subscribe(v => this.onLoadData(v));
     this.setDates();
-    this.selected = this.reports[0];
+    this.selected = ReportType.Frameworks;
   }
 
   /**
    * Loads data from Google Analytics
    */
   public loadData() {
-    const reportRequests = this.generateReportRequests(this.selected.toLocaleLowerCase());
+    const reportRequests = this.generateReportRequests(this.selected as ReportType);
     this.dataLoadService.loadData(reportRequests);
   }
 
@@ -59,28 +65,28 @@ export class DashboardComponent {
     this.templatesData = null;
     this.labelMemberPath = '';
     switch (this.selected) {
-      case this.reports[0]:
+      case ReportType.Frameworks:
         this.frameworksData = this.getFrameworksData(data.reports);
         this.labelMemberPath = 'frameworkName';
         break;
-      case this.reports[1]:
+      case ReportType.ProjectTypes:
         this.projectTypesData = this.getProjectsTypeData(data.reports);
         this.labelMemberPath = 'projectType';
         break;
-      case this.reports[2]:
+      case ReportType.Templates:
         this.templatesData = this.getTemplatesData(data.reports);
         this.labelMemberPath = 'templateName';
         break;
     }
   }
 
-  private generateReportRequests(type: string): ReportRequest[] {
-    switch (type) {
-      case 'frameworks':
+  private generateReportRequests(reportType: ReportType): ReportRequest[] {
+    switch (reportType) {
+      case ReportType.Frameworks:
         return this.generateFrameworksReportRequests();
-      case 'project types':
+      case ReportType.ProjectTypes:
         return this.generateProjectTypesReportRequests();
-      case 'templates':
+      case ReportType.Templates:
         return this.generateTemplatesReportRequests();
     }
   }
