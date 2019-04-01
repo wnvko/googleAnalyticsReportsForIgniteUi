@@ -1,0 +1,17 @@
+<igx-date-picker [(ngModel)]="startDate"></igx-date-picker>
+<igx-date-picker [(ngModel)]="endDate"></igx-date-picker>
+<igx-select [(ngModel)]="selected">
+  <igx-select-item *ngFor="let type of reports" [value]="type">
+    {{type}}
+  </igx-select-item>
+</igx-select>
+<button igxButton="outlined" (click)="loadData()">Load data</button>
+<div *ngIf="frameworksData">
+    <app-data-visualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
+  </div>
+<div *ngIf="projectTypesData">
+  <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
+</div>
+<div *ngIf="templatesData">
+    <app-data-visualization [dataSource]="templatesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
+</div>

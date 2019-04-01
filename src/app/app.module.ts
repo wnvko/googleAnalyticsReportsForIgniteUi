@@ -1,41 +1,53 @@
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
 
 import {
   IgxButtonModule,
   IgxDatePickerModule,
   IgxHierarchicalGridModule,
+  IgxNavbarModule,
   IgxSelectModule,
   IgxTabsModule
 } from 'igniteui-angular';
 import { IgxItemLegendModule} from 'igniteui-angular-charts/ES5/igx-item-legend-module';
 import { IgxPieChartModule} from 'igniteui-angular-charts/ES5/igx-pie-chart-module';
 
+import { AuthenticationModule } from './authentication/authentication.module';
+import { AuthService } from './authentication/services/auth.service';
 
-import { GoogleApiService } from './services/google-api.service';
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { DataService } from './services/data.service';
+import { HomeComponent } from './home/home.component';
+import { fromEventPattern } from 'rxjs';
+import { DataVisualizationComponent } from './data-visualization/data-visualization.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DashboardComponent,
+    HomeComponent,
+    DataVisualizationComponent
   ],
   imports: [
-    AppRoutingModule,
+    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
-    FormsModule,
+    AuthenticationModule,
+    AppRoutingModule,
     IgxButtonModule,
     IgxDatePickerModule,
     IgxHierarchicalGridModule,
     IgxItemLegendModule,
+    IgxNavbarModule,
     IgxPieChartModule,
     IgxSelectModule,
     IgxTabsModule
   ],
-  providers: [GoogleApiService],
+  providers: [ AuthService, DataService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

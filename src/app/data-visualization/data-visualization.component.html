@@ -1,0 +1,15 @@
+<igx-tabs>
+  <igx-tabs-group label="Chart">
+    <igx-pie-chart [dataSource]="dataSource" width="300px" height="300px" labelMemberPath="{{ labelMemberPath }}"
+      valueMemberPath="totalEvents" [legend]="legend" [othersCategoryThreshold]="1">
+    </igx-pie-chart>
+    <igx-item-legend #legend height="100px" width="100px">
+    </igx-item-legend>
+  </igx-tabs-group>
+  <igx-tabs-group label="Table">
+    <igx-hierarchical-grid #hierarchicalGrid [data]="dataSource" [autoGenerate]="true" [width]="'500px'">
+      <igx-row-island [key]="'commands'" [autoGenerate]="true">
+      </igx-row-island>
+    </igx-hierarchical-grid>
+  </igx-tabs-group>
+</igx-tabs>

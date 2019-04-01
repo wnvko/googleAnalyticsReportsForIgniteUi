@@ -14,11 +14,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "types": [
-      "gapi",
-      "gapi.auth2",
-      "gapi.analytics"
-    ],
     "lib": [
       "es2018",
       "dom"
