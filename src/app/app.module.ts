@@ -5,13 +5,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
   IgxButtonModule,
+  IgxCalendarModule,
+  IgxCardModule,
   IgxDatePickerModule,
-  IgxHierarchicalGridModule,
+  IgxGridModule,
   IgxNavbarModule,
-  IgxSelectModule,
   IgxTabsModule
 } from 'igniteui-angular';
-import { IgxItemLegendModule} from 'igniteui-angular-charts/ES5/igx-item-legend-module';
 import { IgxPieChartModule} from 'igniteui-angular-charts/ES5/igx-pie-chart-module';
 
 import { AuthenticationModule } from './authentication/authentication.module';
@@ -39,12 +39,12 @@ import { DataVisualizationComponent } from './data-visualization/data-visualizat
     AuthenticationModule,
     AppRoutingModule,
     IgxButtonModule,
+    IgxCalendarModule,
+    IgxCardModule,
     IgxDatePickerModule,
-    IgxHierarchicalGridModule,
-    IgxItemLegendModule,
+    IgxGridModule,
     IgxNavbarModule,
     IgxPieChartModule,
-    IgxSelectModule,
     IgxTabsModule
   ],
   providers: [ AuthService, DataService ],

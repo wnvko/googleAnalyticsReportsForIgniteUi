@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ReportRequest, DateRange, Metric, Dimension, Filter, DimensionFilterClause } from '../models/index';
 import { DataService } from '../services/data.service';
+import { DataVisualizationComponent } from '../data-visualization/data-visualization.component';
 
 enum ReportType {
   Frameworks = 'Frameworks',
@@ -15,9 +16,11 @@ enum ReportType {
 })
 export class DashboardComponent {
   private VIEW_ID = '174416971';
+
+  @ViewChild('dataVisualization')
+  private dataVisualization: DataVisualizationComponent;
+
   public loggedIn = false;
-  public startDate: Date;
-  public endDate: Date;
   public selected: ReportType;
   public reportsTypes: string[] = [ReportType.Frameworks, ReportType.ProjectTypes, ReportType.Templates];
   public frameworksData: FrameworkData[];
@@ -29,7 +32,6 @@ export class DashboardComponent {
     private dataLoadService: DataService
   ) {
     this.dataLoadService.onDataLoaded.subscribe(v => this.onLoadData(v));
-    this.setDates();
     this.selected = ReportType.Frameworks;
   }
 
@@ -41,20 +43,12 @@ export class DashboardComponent {
     this.dataLoadService.loadData(reportRequests);
   }
 
-  /**
-   * Sets initial dates to last full month
-   */
-  private setDates() {
-    const today = new Date();
-    const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const firstDayLastMonth = new Date(firstDayOfCurrentMonth.getFullYear(), firstDayOfCurrentMonth.getMonth() - 1, 1);
-    const lastDayLastMonth = new Date(
-      firstDayOfCurrentMonth.getFullYear(),
-      firstDayOfCurrentMonth.getMonth(),
-      firstDayOfCurrentMonth.getDate() - 1);
-    this.startDate = firstDayLastMonth;
-    this.endDate = lastDayLastMonth;
+  private dateRangeChanged(range: Date[]) {
+    if (range.length > 1) {
+      this.loadData();
+    }
   }
+
 
   /**
    * Visualizes loaded data
@@ -93,8 +87,8 @@ export class DashboardComponent {
 
   private generateFrameworksReportRequests(): ReportRequest[] {
     const dateRange: DateRange = {
-      startDate: this.startDate.toISOString().substring(0, 10),
-      endDate: this.endDate.toISOString().substring(0, 10)
+      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
+      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
     };
     const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
     const dimensionsForWizard: Dimension[] = [
@@ -136,8 +130,8 @@ export class DashboardComponent {
 
   private generateProjectTypesReportRequests(): ReportRequest[] {
     const dateRange: DateRange = {
-      startDate: this.startDate.toISOString().substring(0, 10),
-      endDate: this.endDate.toISOString().substring(0, 10)
+      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
+      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
     };
     const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
     const dimensionsForWizard: Dimension[] = [
@@ -179,8 +173,8 @@ export class DashboardComponent {
 
   private generateTemplatesReportRequests(): ReportRequest[] {
     const dateRange: DateRange = {
-      startDate: this.startDate.toISOString().substring(0, 10),
-      endDate: this.endDate.toISOString().substring(0, 10)
+      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
+      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
     };
     const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
     const dimensionsForWizard: Dimension[] = [

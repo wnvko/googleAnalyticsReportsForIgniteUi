@@ -1,17 +1,14 @@
-<igx-date-picker [(ngModel)]="startDate"></igx-date-picker>
-<igx-date-picker [(ngModel)]="endDate"></igx-date-picker>
-<igx-select [(ngModel)]="selected">
-  <igx-select-item *ngFor="let type of reportsTypes" [value]="type">
-    {{type}}
-  </igx-select-item>
-</igx-select>
-<button igxButton="outlined" (click)="loadData()">Load data</button>
-<div *ngIf="frameworksData">
-    <app-data-visualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
-  </div>
-<div *ngIf="projectTypesData">
-  <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
-</div>
-<div *ngIf="templatesData">
+<igx-tabs>
+  <igx-tabs-group label="FRAMEWORKS">
+    <app-data-visualization #dataVisualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"
+      (onDateRangeChanged)="dateRangeChanged($event)"></app-data-visualization>
+  </igx-tabs-group>
+  <igx-tabs-group label="PROJECT TYPE">
+    <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath">
+    </app-data-visualization>
+  </igx-tabs-group>
+  <igx-tabs-group label="TEMPLATES">
     <app-data-visualization [dataSource]="templatesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
-</div>
+
+  </igx-tabs-group>
+</igx-tabs>

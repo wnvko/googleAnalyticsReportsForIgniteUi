@@ -1,15 +1,33 @@
-<igx-tabs>
-  <igx-tabs-group label="Chart">
-    <igx-pie-chart [dataSource]="dataSource" width="300px" height="300px" labelMemberPath="{{ labelMemberPath }}"
-      valueMemberPath="totalEvents" [legend]="legend" [othersCategoryThreshold]="1">
-    </igx-pie-chart>
-    <igx-item-legend #legend height="100px" width="100px">
-    </igx-item-legend>
-  </igx-tabs-group>
-  <igx-tabs-group label="Table">
-    <igx-hierarchical-grid #hierarchicalGrid [data]="dataSource" [autoGenerate]="true" [width]="'500px'">
-      <igx-row-island [key]="'commands'" [autoGenerate]="true">
-      </igx-row-island>
-    </igx-hierarchical-grid>
-  </igx-tabs-group>
-</igx-tabs>
+<div class="container">
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <igx-card>
+        <igx-card-content>
+          {{startDate.getFullYear()}}
+        </igx-card-content>
+        <igx-card-header>
+          {{formatDateForHeader(startDate)}} - {{formatDateForHeader(endDate)}}
+        </igx-card-header>
+      </igx-card>
+    </div>
+    <div class="calendar">
+      <igx-calendar #calendar selection="range" [value]="[startDate, endDate]" [viewDate]="startDate"
+        (onSelection)="dateRangeChanged($event)"></igx-calendar>
+    </div>
+  </div>
+  <div class="data">
+    <div class="data-header">
+      <div *ngFor="let item of dataSource">
+        <div>{{item.frameworkName}}</div>
+        <div>{{item.totalEvents}} total events</div>
+      </div>
+    </div>
+    <div class="data-content">
+      <igx-pie-chart #chart [dataSource]="dataSource" width="400px" height="400px"
+        labelMemberPath="{{ labelMemberPath }}" valueMemberPath="totalEvents" [othersCategoryThreshold]="0"
+        allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)">
+      </igx-pie-chart>
+      <igx-grid *ngIf="gridData" [data]="gridData" [autoGenerate]="true" width="'400px'"></igx-grid>
+    </div>
+  </div>
+</div>

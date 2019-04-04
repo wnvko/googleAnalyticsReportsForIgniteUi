@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+}
+
+.calendar-container {
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+.data {
+    flex-grow: 2;
+}
+
+.data-header {
+    display: flex;
+}
+.data-content {
+    display: flex;
+}
