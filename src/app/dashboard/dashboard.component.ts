@@ -2,11 +2,12 @@ import { Component, ViewChild } from '@angular/core';
 import { ReportRequest, DateRange, Metric, Dimension, Filter, DimensionFilterClause } from '../models/index';
 import { DataService } from '../services/data.service';
 import { DataVisualizationComponent } from '../data-visualization/data-visualization.component';
+import { Data } from '../models/index';
 
 enum ReportType {
-  Frameworks = 'Frameworks',
-  ProjectTypes = 'Project Types',
-  Templates = 'Templates'
+  Frameworks = 'frameworks',
+  ProjectTypes = 'project types',
+  Templates = 'templates'
 }
 
 @Component({
@@ -23,9 +24,9 @@ export class DashboardComponent {
   public loggedIn = false;
   public selected: ReportType;
   public reportsTypes: string[] = [ReportType.Frameworks, ReportType.ProjectTypes, ReportType.Templates];
-  public frameworksData: FrameworkData[];
-  public projectTypesData: ProjectTypeData[];
-  public templatesData: TemplateData[];
+  public frameworksData: Data[];
+  public projectTypesData: Data[];
+  public templatesData: Data[];
   public labelMemberPath: string;
 
   constructor(
@@ -33,13 +34,21 @@ export class DashboardComponent {
   ) {
     this.dataLoadService.onDataLoaded.subscribe(v => this.onLoadData(v));
     this.selected = ReportType.Frameworks;
+    this.labelMemberPath = 'name';
   }
 
   /**
    * Loads data from Google Analytics
    */
-  public loadData() {
-    const reportRequests = this.generateReportRequests(this.selected as ReportType);
+  public loadData(event?) {
+    if (event) {
+      const oldSelected = this.selected;
+      this.selected = event.group.label.toLowerCase();
+      if (oldSelected === this.selected) {
+        return;
+      }
+    }
+    const reportRequests = this.generateReportRequestsByType(this.selected as ReportType);
     this.dataLoadService.loadData(reportRequests);
   }
 
@@ -49,7 +58,6 @@ export class DashboardComponent {
     }
   }
 
-
   /**
    * Visualizes loaded data
    */
@@ -57,311 +65,196 @@ export class DashboardComponent {
     this.frameworksData = null;
     this.projectTypesData = null;
     this.templatesData = null;
-    this.labelMemberPath = '';
     switch (this.selected) {
       case ReportType.Frameworks:
-        this.frameworksData = this.getFrameworksData(data.reports);
-        this.labelMemberPath = 'frameworkName';
+        const frameworkNameFilter = (s: string) => s.substring(11);
+        const frameworkNames: {name: string, imageUrl?: string}[] = [
+          {name: 'Angular', imageUrl: './assets/angular.png'},
+          {name: 'jQuery', imageUrl: './assets/JQuery.png'},
+          {name: 'React', imageUrl:'./assets/react.png'}
+        ];
+        const frameworkWizardFilter = 'ga:eventLabel';
+        const frameworkEventFilter = 'ga:dimension1';
+        this.frameworksData = this.getData(data.reports, frameworkNames, frameworkNameFilter, frameworkWizardFilter, frameworkEventFilter);
         break;
       case ReportType.ProjectTypes:
-        this.projectTypesData = this.getProjectsTypeData(data.reports);
-        this.labelMemberPath = 'projectType';
+        const projectTypeNameFilter = (s: string) => s.substring(s.indexOf(':') + 2);
+        const projectTypeNames: {name: string, imageUrl?: string}[] = [
+          { name: 'Ignite UI Angular Wrappers' },
+          { name: 'Ignite UI for Angular' },
+          { name: 'Ignite UI for JavaScript React Wrappers' },
+          { name: 'Ignite UI for React' }
+        ];
+        const projectTypeWizardFilter = 'ga:eventLabel';
+        const projectTypeEventFilter = 'ga:dimension2';
+        this.projectTypesData =
+          this.getData(data.reports, projectTypeNames, projectTypeNameFilter, projectTypeWizardFilter, projectTypeEventFilter);
         break;
       case ReportType.Templates:
-        this.templatesData = this.getTemplatesData(data.reports);
-        this.labelMemberPath = 'templateName';
+        const templateNameFilter = (s: string) => s.substring(s.indexOf(':') + 2);
+        const templateNames: {name: string, imageUrl?: string}[] = [
+          { name: 'empty' },
+          { name: 'base' },
+          { name: 'Empty Project' },
+          { name: 'Default side navigation' },
+          { name: 'Side navigation + login' },
+          { name: 'jquery with Javascript' },
+          { name: 'Default top navigation' }
+        ];
+        const templateWizardFilter = 'ga:eventLabel';
+        this.templatesData = this.getData(data.reports, templateNames, templateNameFilter, templateWizardFilter);
         break;
     }
   }
 
-  private generateReportRequests(reportType: ReportType): ReportRequest[] {
+  private generateReportRequestsByType(reportType: ReportType): ReportRequest[] {
+    const wizardDimensions: Dimension[] = [
+      {name: 'ga:eventLabel'},
+      {name: 'ga:eventAction'}
+    ];
     switch (reportType) {
       case ReportType.Frameworks:
-        return this.generateFrameworksReportRequests();
+        const frameworkFilters: Filter[] = [{
+            dimensionName: 'ga:eventLabel',
+            operator: 'EXACT',
+            expressions: ['Choose framework:']
+        }];
+
+        const frameworkEventDimensions: Dimension[] = [
+          {name: 'ga:dimension1'},
+          {name: 'ga:eventCategory'}
+        ];
+
+        return this.generateReportRequests(frameworkFilters, wizardDimensions, frameworkEventDimensions);
       case ReportType.ProjectTypes:
-        return this.generateProjectTypesReportRequests();
+        const projectTypeFilters: Filter[] = [{
+            dimensionName: 'ga:eventLabel',
+            operator: 'IN_LIST',
+            expressions: ['Choose the type of project:', 'Choose the type of the project:']
+        }];
+
+        const projectTypeEventDimensions: Dimension[] = [
+          {name: 'ga:dimension2'},
+          {name: 'ga:eventCategory'}
+        ];
+
+        return this.generateReportRequests(projectTypeFilters, wizardDimensions, projectTypeEventDimensions);
       case ReportType.Templates:
-        return this.generateTemplatesReportRequests();
-    }
-  }
-
-  private generateFrameworksReportRequests(): ReportRequest[] {
-    const dateRange: DateRange = {
-      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
-      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
-    };
-    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
-    const dimensionsForWizard: Dimension[] = [
-      {name: 'ga:eventLabel'},
-      {name: 'ga:eventAction'}
-    ];
-    const filtersForWizard: Filter[] = [
-      {
-          dimensionName: 'ga:eventLabel',
-          operator: 'EXACT',
-          expressions: ['Choose framework:']
-      }
-    ];
-    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters: filtersForWizard}];
-    const reportRequestForWizard: ReportRequest = {
-      viewId: this.VIEW_ID,
-      dateRanges: [dateRange],
-      metrics,
-      dimensions: dimensionsForWizard,
-      dimensionFilterClauses: dimensionFilterClausesForWizard
-    };
-
-    const dimensionsForEvents: Dimension[] = [
-      {name: 'ga:dimension1'},
-      {name: 'ga:eventCategory'}
-    ];
-    const reportRequestForEvents: ReportRequest = {
-      viewId: this.VIEW_ID,
-      dateRanges: [dateRange],
-      metrics,
-      dimensions: dimensionsForEvents
-    };
-
-    return [
-      reportRequestForWizard,
-      reportRequestForEvents
-    ];
-  }
-
-  private generateProjectTypesReportRequests(): ReportRequest[] {
-    const dateRange: DateRange = {
-      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
-      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
-    };
-    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
-    const dimensionsForWizard: Dimension[] = [
-      {name: 'ga:eventLabel'},
-      {name: 'ga:eventAction'}
-    ];
-    const filtersForWizard: Filter[] = [
-      {
-          dimensionName: 'ga:eventLabel',
-          operator: 'IN_LIST',
-          expressions: ['Choose the type of project:', 'Choose the type of the project:']
-      }
-    ];
-    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters: filtersForWizard}];
-    const reportRequestForWizard: ReportRequest = {
-      viewId: this.VIEW_ID,
-      dateRanges: [dateRange],
-      metrics,
-      dimensions: dimensionsForWizard,
-      dimensionFilterClauses: dimensionFilterClausesForWizard
-    };
-
-    const dimensionsForEvents: Dimension[] = [
-      {name: 'ga:dimension2'},
-      {name: 'ga:eventCategory'}
-    ];
-    const reportRequestForEvents: ReportRequest = {
-      viewId: this.VIEW_ID,
-      dateRanges: [dateRange],
-      metrics,
-      dimensions: dimensionsForEvents
-    };
-
-    return [
-      reportRequestForWizard,
-      reportRequestForEvents
-    ];
-  }
-
-  private generateTemplatesReportRequests(): ReportRequest[] {
-    const dateRange: DateRange = {
-      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
-      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
-    };
-    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
-    const dimensionsForWizard: Dimension[] = [
-      {name: 'ga:eventLabel'},
-      {name: 'ga:eventAction'}
-    ];
-    const filtersForWizard: Filter[] = [
-      {
+        const templatesFilters: Filter[] = [{
           dimensionName: 'ga:eventLabel',
           operator: 'BEGINS_WITH',
           expressions: ['Choose project template:']
-      }
-    ];
-    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters: filtersForWizard}];
+        }];
+        return this.generateReportRequests(templatesFilters, wizardDimensions);
+    }
+  }
+
+  private generateReportRequests(
+    filters: Filter[],
+    wizardDimensions: Dimension[],
+    eventDimensions?: Dimension[]): ReportRequest[] {
+    const dateRange: DateRange = {
+      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
+      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
+    };
+    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
+    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters}];
     const reportRequestForWizard: ReportRequest = {
       viewId: this.VIEW_ID,
       dateRanges: [dateRange],
       metrics,
-      dimensions: dimensionsForWizard,
+      dimensions: wizardDimensions,
       dimensionFilterClauses: dimensionFilterClausesForWizard
     };
 
-    return [reportRequestForWizard];
+    const reportRequest: ReportRequest[] = [reportRequestForWizard];
+    if (eventDimensions) {
+      const reportRequestForEvents: ReportRequest = {
+        viewId: this.VIEW_ID,
+        dateRanges: [dateRange],
+        metrics,
+        dimensions: eventDimensions
+      };
+      reportRequest.push(reportRequestForEvents);
+    }
+
+    return reportRequest;
   }
 
-  private getFrameworksData = (reports): FrameworkData[] => {
-    const frameworksData: FrameworkData[] = this.initializeFrameworksData();
+  private getData = (
+    reports,
+    names: {name: string, imageUrl?: string}[],
+    nameFilter: (s: string) => string,
+    wizardFilter: string,
+    eventFilter?: string): Data[] => {
+    const data: Data[] = this.initializeData(names);
     for (const report of reports) {
-      if (report.columnHeader.dimensions.includes('ga:eventLabel')) {
-        this.getFrameworksDataForWizard(report, frameworksData);
+      if (report.columnHeader.dimensions.includes(wizardFilter)) {
+        this.getWizardData(report, data, nameFilter);
       }
 
-      if (report.columnHeader.dimensions.includes('ga:dimension1')) {
-        this.getFrameworksDataForEvents(report, frameworksData);
+      if (report.columnHeader.dimensions.includes(eventFilter)) {
+        this.getEventData(report, data);
       }
     }
-    return frameworksData;
+    return data;
   }
 
-  private initializeFrameworksData(): FrameworkData[] {
-    const frameworksData: FrameworkData[] = [];
-    frameworksData.push({
-      frameworkName: 'Angular',
-      totalEvents: 0,
-      commands: []
-    });
-    frameworksData.push({
-      frameworkName: 'jQuery',
-      totalEvents: 0,
-      commands: []
-    });
-    frameworksData.push({
-      frameworkName: 'React',
-      totalEvents: 0,
-      commands: []
-    });
-    return frameworksData;
-  }
-
-  private getFrameworksDataForWizard(data: any, frameworksData: FrameworkData[]): FrameworkData[] {
-    for (const row of data.data.rows) {
-      const frameworkName: string = row.dimensions[1].substring(11);
-      const frameworkData: FrameworkData = frameworksData.find((item: FrameworkData) => {
-        return item.frameworkName.toLowerCase() === frameworkName.toLowerCase();
+  private initializeData(items: {name: string, imageUrl?: string}[]): Data[] {
+    const data: Data[] = [];
+    for (const item of items) {
+      data.push({
+        name: item.name,
+        totalEvents: 0,
+        imageUrl: item.imageUrl,
+        commands: []
       });
-      if (!frameworkData) {
+    }
+    return data;
+  }
+
+  private getWizardData(gaData: any, data: Data[], nameFilter: (s: string) => string): Data[] {
+    for (const row of gaData.data.rows) {
+      const name: string = nameFilter(row.dimensions[1]);
+      const dataRow: Data = data.find((item: Data) => {
+        return item.name.toLowerCase() === name.toLowerCase();
+      });
+      if (!dataRow) {
         continue;
       }
       const totalEvents: number = parseInt(row.metrics[0].values[0]);
-      frameworkData.totalEvents += totalEvents;
-      frameworkData.commands.push({
+      dataRow.totalEvents += totalEvents;
+      dataRow.commands.push({
         name: 'ig wizard',
         totalEvents
       });
     }
 
-    return frameworksData;
+    return data;
   }
 
-  private getFrameworksDataForEvents(data: any, frameworksData: FrameworkData[]): FrameworkData[] {
-    for (const row of data.data.rows) {
-      const frameworkName: string = row.dimensions[0];
-      const frameworkData: FrameworkData = frameworksData.find((item: FrameworkData) => {
-        return item.frameworkName.toLowerCase() === frameworkName.toLowerCase();
+  private getEventData(gaData: any, data: Data[]): Data[] {
+    for (const row of gaData.data.rows) {
+      const name: string = this.updateName(row.dimensions[0]);
+      const dataRow: Data = data.find((item: Data) => {
+        return item.name.toLowerCase() === name.toLowerCase();
       });
-      if (!frameworkData) {
+      if (!dataRow) {
         continue;
       }
-      const totalEvents: number = parseInt(row.metrics[0].values[0]);
-      frameworkData.totalEvents += totalEvents;
+      const totalEvents: number = parseInt(row.metrics[0].values[0], 10);
+      dataRow.totalEvents += totalEvents;
       //  TODO: check if command already exists in the list
-      frameworkData.commands.push({
+      dataRow.commands.push({
         name: row.dimensions[1],
         totalEvents
       });
     }
 
-    return frameworksData;
+    return data;
   }
 
-  private getProjectsTypeData = (reports): ProjectTypeData[] => {
-    const projectsTypeData: ProjectTypeData[] = this.initializeProjectsTypeData();
-    for (const report of reports) {
-      if (report.columnHeader.dimensions.includes('ga:eventLabel')) {
-        this.getProjectsTypeDataForWizard(report, projectsTypeData);
-      }
-
-      if (report.columnHeader.dimensions.includes('ga:dimension2')) {
-        this.getProjectsTypeDataForEvents(report, projectsTypeData);
-      }
-    }
-    return projectsTypeData;
-  }
-
-  private initializeProjectsTypeData(): ProjectTypeData[] {
-    const projectsTypeData: ProjectTypeData[] = [];
-    projectsTypeData.push({
-      projectType: 'Ignite UI Angular Wrappers', //ig-ts
-      totalEvents: 0,
-      commands: []
-    });
-    projectsTypeData.push({
-      projectType: 'Ignite UI for Angular', //igx-ts
-      totalEvents: 0,
-      commands: []
-    });
-    projectsTypeData.push({
-      projectType: 'jquery', //js
-      totalEvents: 0,
-      commands: []
-    });
-    projectsTypeData.push({
-      projectType: 'Ignite UI for JavaScript React Wrappers', //es6
-      totalEvents: 0,
-      commands: []
-    });
-    projectsTypeData.push({
-      projectType: 'Ignite UI for React', //igr-es6
-      totalEvents: 0,
-      commands: []
-    });
-    return projectsTypeData;
-  }
-
-  private getProjectsTypeDataForWizard(data: any, projectsTypeData: ProjectTypeData[]): ProjectTypeData[] {
-    for (const row of data.data.rows) {
-      const fullName: string = row.dimensions[1];
-      const projectType: string = fullName.substring(fullName.indexOf(':') + 2);
-      const projectTypeData: ProjectTypeData = projectsTypeData.find((item: ProjectTypeData) => {
-        return item.projectType.toLowerCase() === projectType.toLowerCase();
-      });
-      if (!projectTypeData) {
-        continue;
-      }
-      const totalEvents: number = parseInt(row.metrics[0].values[0]);
-      projectTypeData.totalEvents += totalEvents;
-      projectTypeData.commands.push({
-        name: 'ig wizard',
-        totalEvents
-      });
-    }
-
-    return projectsTypeData;
-  }
-
-  private getProjectsTypeDataForEvents(data: any, projectsTypeData: ProjectTypeData[]): ProjectTypeData[] {
-    for (const row of data.data.rows) {
-      const projectTypeName: string = this.translateProjectTypeName(row.dimensions[0]);
-      const projectTypeData: ProjectTypeData = projectsTypeData.find((item: ProjectTypeData) => {
-        return item.projectType.toLowerCase() === projectTypeName.toLowerCase();
-      });
-      if (!projectTypeData) {
-        continue;
-      }
-      const totalEvents: number = parseInt(row.metrics[0].values[0]);
-      projectTypeData.totalEvents += totalEvents;
-      //  TODO: check if command already exists in the list
-      projectTypeData.commands.push({
-        name: row.dimensions[1],
-        totalEvents
-      });
-    }
-
-    return projectsTypeData;
-  }
-
-  private translateProjectTypeName(shortTypeName: string): string {
+  private updateName(shortTypeName: string): string {
     let longTypeName: string;
     switch (shortTypeName) {
       case 'ig-ts':
@@ -380,103 +273,9 @@ export class DashboardComponent {
         longTypeName = 'Ignite UI for React';
         break;
       default:
-        longTypeName = 'UNSUPPORTED SHORT TYPE NAME!';
+        longTypeName = shortTypeName;
     }
 
     return longTypeName;
   }
-
-  private getTemplatesData = (reports): TemplateData[] => {
-    const templatesData: TemplateData[] = this.initializeTemplatesData();
-    for (const report of reports) {
-      if (report.columnHeader.dimensions.includes('ga:eventLabel')) {
-        this.getTemplatesDataForWizard(report, templatesData);
-      }
-    }
-    return templatesData;
-  }
-
-  private initializeTemplatesData(): TemplateData[] {
-    const templatesData: TemplateData[] = [];
-    templatesData.push({
-      templateName: 'empty',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'base',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'Empty Project',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'Default side navigation',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'Side navigation + login',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'jquery with Javascript',
-      totalEvents: 0,
-      commands: []
-    });
-    templatesData.push({
-      templateName: 'Default top navigation',
-      totalEvents: 0,
-      commands: []
-    });
-    return templatesData;
-  }
-
-  private getTemplatesDataForWizard(data: any, projectsTypeData: TemplateData[]): TemplateData[] {
-    for (const row of data.data.rows) {
-      const fullName: string = row.dimensions[1];
-      const template: string = fullName.substring(fullName.indexOf(':') + 2);
-      const templateData: TemplateData = projectsTypeData.find((item: TemplateData) => {
-        return item.templateName.toLowerCase() === template.toLowerCase();
-      });
-      if (!templateData) {
-        continue;
-      }
-      const totalEvents: number = parseInt(row.metrics[0].values[0]);
-      templateData.totalEvents += totalEvents;
-      templateData.commands.push({
-        name: 'ig wizard',
-        totalEvents
-      });
-    }
-
-    return projectsTypeData;
-  }
-}
-
-interface Command {
-  name: string;
-  totalEvents: number;
-}
-
-interface FrameworkData {
-  frameworkName: string;
-  totalEvents: number;
-  commands: Command[];
-}
-
-interface ProjectTypeData {
-  projectType: string;
-  totalEvents: number;
-  commands: Command[];
-}
-
-interface TemplateData {
-  templateName: string;
-  totalEvents: number;
-  commands: Command[];
 }

@@ -18,8 +18,7 @@
   <div class="data">
     <div class="data-header">
       <div *ngFor="let item of dataSource">
-        <div>{{item.frameworkName}}</div>
-        <div>{{item.totalEvents}} total events</div>
+        <app-events-visualization [item]="item"></app-events-visualization>
       </div>
     </div>
     <div class="data-content">

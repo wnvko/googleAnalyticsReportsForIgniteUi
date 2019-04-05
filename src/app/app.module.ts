@@ -24,13 +24,15 @@ import { DataService } from './services/data.service';
 import { HomeComponent } from './home/home.component';
 import { fromEventPattern } from 'rxjs';
 import { DataVisualizationComponent } from './data-visualization/data-visualization.component';
+import { EventsVisualizationComponent } from './events-visualization/events-visualization.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     HomeComponent,
-    DataVisualizationComponent
+    DataVisualizationComponent,
+    EventsVisualizationComponent
   ],
   imports: [
     FormsModule,

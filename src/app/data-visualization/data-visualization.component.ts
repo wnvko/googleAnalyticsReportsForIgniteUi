@@ -1,6 +1,5 @@
-import { Component, Input, EventEmitter, Output, ViewChild, OnInit } from '@angular/core';
-import { IgxPieChartComponent } from 'igniteui-angular-charts/ES5/igx-pie-chart-component';
-import { IgxCalendarComponent } from 'igniteui-angular';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
+import { Data, Command } from '../models/index';
 
 @Component({
   selector: 'app-data-visualization',
@@ -13,7 +12,7 @@ export class DataVisualizationComponent implements OnInit {
   @Output() onDateRangeChanged = new EventEmitter<Date[]>();
 
   @Input()
-  public dataSource: any[];
+  public dataSource: Data[];
 
   @Input()
   public labelMemberPath: string;
@@ -24,13 +23,7 @@ export class DataVisualizationComponent implements OnInit {
   @Input()
   public endDate: Date;
 
-  public gridData: any[];
-
-  @ViewChild('chart')
-  private chart: IgxPieChartComponent;
-
-  @ViewChild('calendar')
-  private calendar: IgxCalendarComponent;
+  public gridData: Command[];
 
   constructor() {
   }
@@ -55,7 +48,7 @@ export class DataVisualizationComponent implements OnInit {
     this.onDateRangeChanged.emit([this.startDate, this.endDate]);
   }
 
-  formatDateForHeader(date: Date): String {
+  formatDateForHeader(date: Date): string {
     const options = { month: 'short', day: 'numeric'};
     return date.toLocaleDateString('en-US', options);
   }
@@ -65,7 +58,7 @@ export class DataVisualizationComponent implements OnInit {
   }
 
   chart_SliceClicked(event) {
-    this.chart.explodedSlices.clear();
+    event.sender.explodedSlices.clear();
     event.args.isExploded = true;
     this.gridData = event.args.dataContext.commands.sort((a, b) => b.totalEvents - a.totalEvents);
   }

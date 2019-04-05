@@ -1,9 +1,9 @@
-<igx-tabs>
+<igx-tabs (onTabItemSelected)="loadData($event)">
   <igx-tabs-group label="FRAMEWORKS">
     <app-data-visualization #dataVisualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"
       (onDateRangeChanged)="dateRangeChanged($event)"></app-data-visualization>
   </igx-tabs-group>
-  <igx-tabs-group label="PROJECT TYPE">
+  <igx-tabs-group label="PROJECT TYPES">
     <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath">
     </app-data-visualization>
   </igx-tabs-group>
