@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
+  IgxAvatarModule,
   IgxButtonModule,
   IgxCalendarModule,
   IgxCardModule,
@@ -22,7 +23,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DataService } from './services/data.service';
 import { HomeComponent } from './home/home.component';
-import { fromEventPattern } from 'rxjs';
 import { DataVisualizationComponent } from './data-visualization/data-visualization.component';
 import { EventsVisualizationComponent } from './events-visualization/events-visualization.component';
 
@@ -40,6 +40,7 @@ import { EventsVisualizationComponent } from './events-visualization/events-visu
     BrowserAnimationsModule,
     AuthenticationModule,
     AppRoutingModule,
+    IgxAvatarModule,
     IgxButtonModule,
     IgxCalendarModule,
     IgxCardModule,
