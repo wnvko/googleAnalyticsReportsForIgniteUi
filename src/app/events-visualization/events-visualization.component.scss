@@ -1,3 +1,22 @@
+@import "~igniteui-angular/lib/core/styles/themes/index";
+@import "../themes/variables";
+
+$custom-card-theme: igx-card-theme(
+    $border-radius: 0,
+    $header-text-color: $primary-color,
+    $content-text-color: black
+);
+
+
+.event-card {
+    @include igx-css-vars($custom-card-theme);
+    igx-card-header {
+        padding: 0;
+        max-height: 128px;
+        min-height: 128px;
+    }
+}
+
 .image-container {
     width: 100px;
     height: 100px;

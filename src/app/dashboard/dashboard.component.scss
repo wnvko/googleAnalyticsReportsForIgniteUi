@@ -1,0 +1,13 @@
+@import "~igniteui-angular/lib/core/styles/themes/index";
+@import "../themes/variables";
+
+$custom-tabs-theme: igx-tabs-theme(
+    $item-background: $primary-color,
+    $item-text-color: black,
+    $item-active-color: white,
+    $indicator-color: $secondary-color
+);
+
+.tabs-wrapper-fix {
+    @include igx-css-vars($custom-tabs-theme);
+}

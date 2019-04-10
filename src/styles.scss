@@ -1,1 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~igniteui-angular/lib/core/styles/themes/index";
+@import "~minireset.css/minireset";
+@import "./app/themes/variables";
+
+@include igx-core();
+@include igx-theme($app-color-palette, $legacy-support: false);
+
+$no-radius-card: igx-card-theme(
+    $border-radius: 0
+);
+
+@include igx-css-vars($no-radius-card);
+
+
+$custom-navbar-theme: igx-navbar-theme(
+     $disable-shadow: true
+);
+
+.custom-navbar {
+    .igx-navbar {
+        height: 212px;
+    }
+    @include igx-navbar-typography(
+        $type-scale: $default-type-scale, 
+        $categories: (title: 'h3')
+    );
+
+    @include igx-css-vars($custom-navbar-theme);
+}

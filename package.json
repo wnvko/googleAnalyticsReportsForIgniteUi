@@ -24,6 +24,7 @@
     "igniteui-angular": "^7.2.2",
     "igniteui-angular-charts": "^7.2.0",
     "igniteui-angular-core": "^7.2.0",
+    "minireset.css": "0.0.4",
     "rxjs": "~6.3.3",
     "tslib": "^1.9.0",
     "web-animations-js": "^2.3.1",

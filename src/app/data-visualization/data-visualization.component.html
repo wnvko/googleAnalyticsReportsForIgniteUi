@@ -1,7 +1,7 @@
-<div class="container">
+<div class="flex container">
   <div class="calendar-container">
     <div class="calendar-header">
-      <igx-card>
+      <igx-card class="calendar-header-card">
         <igx-card-content>
           {{startDate.getFullYear()}}
         </igx-card-content>
@@ -16,12 +16,12 @@
     </div>
   </div>
   <div class="data">
-    <div class="data-header">
-      <div *ngFor="let item of dataSource">
+    <div class="flex">
+      <div *ngFor="let item of dataSource" style="margin-left:24px;">
         <app-events-visualization [item]="item"></app-events-visualization>
       </div>
     </div>
-    <div class="data-content">
+    <div class="flex">
       <igx-pie-chart #chart [dataSource]="dataSource" width="400px" height="400px"
         labelMemberPath="{{ labelMemberPath }}" valueMemberPath="totalEvents" [othersCategoryThreshold]="0"
         allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)">

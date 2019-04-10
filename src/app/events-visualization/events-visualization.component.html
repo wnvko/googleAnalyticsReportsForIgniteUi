@@ -1,13 +1,13 @@
-<igx-card>
+<igx-card class="event-card">
   <igx-card-header>
     <div *ngIf="item.imageUrl" class="image-container">
       <span class="image-helper"></span>
       <img src="{{item.imageUrl}}">
     </div>
     <div class="igx-card-header__tgroup">
-      <h4 *ngIf="!item.imageUrl" class="igx-card-header__subtitle">{{item.name}}</h4>
-      <h2 class="igx-card-header__title">{{item.totalEvents}}</h2>
-      <h5 class="igx-card-header__subtitle">Total events</h5>
+      <h3 *ngIf="!item.imageUrl" class="igx-card-header__subtitle">{{item.name}}</h3>
+      <h3 class="igx-card-header__title">{{item.totalEvents}}</h3>
+      <h6 class="igx-card-header__subtitle">Total events</h6>
     </div>
   </igx-card-header>
 </igx-card>

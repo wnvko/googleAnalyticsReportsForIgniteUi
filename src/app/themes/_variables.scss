@@ -1,0 +1,10 @@
+
+$primary-color: #0056FF;
+$secondary-color:#02E6FF;
+
+$app-color-palette: igx-palette(
+    $primary: $primary-color,
+    $secondary: $secondary-color
+);
+
+$secondary-600: igx-color($app-color-palette, 'secondary', 600);

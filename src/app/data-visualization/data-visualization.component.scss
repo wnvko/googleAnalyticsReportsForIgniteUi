@@ -1,6 +1,29 @@
-.container {
+@import "~igniteui-angular/lib/core/styles/themes/index";
+@import "../themes/variables";
+
+$custom-card-theme: igx-card-theme(
+    $background: $secondary-600,
+    $border-radius: 0,
+    $header-text-color: white,
+    $content-text-color: white
+);
+
+.calendar-header-card {
+    @include igx-css-vars($custom-card-theme);
+    igx-card-header {
+        padding: 8;
+        max-height: 128px;
+        min-height: 64px;
+    }
+}
+
+.flex {
     display: flex;
     flex-wrap: wrap;
+}
+
+.container {
+    margin: 50px;
 }
 
 .calendar-container {
@@ -12,10 +35,7 @@
     flex-grow: 2;
 }
 
-.data-header {
-    display: flex;
-    flex-wrap: wrap;
-}
-.data-content {
-    display: flex;
+igx-card-header {
+    font-size: 24px;
+    padding-top: 0;
 }
