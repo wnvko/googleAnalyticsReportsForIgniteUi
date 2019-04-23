@@ -15,14 +15,16 @@
   </div>
   <div igxLayout igxLayoutDir="column" igxLayoutJustify="space-around">
     <div igxLayout igxLayoutJustify="space-around" igxLayoutWrap="wrap">
-      <app-events-visualization class="event-container" *ngFor="let item of dataSource | eventSort" [item]="item"></app-events-visualization>
+      <app-events-visualization class="event-container" *ngFor="let item of dataSource | eventSort" [item]="item">
+      </app-events-visualization>
     </div>
-    <div igxLayout igxLayoutJustify="space-around">
+    <div igxLayout igxLayoutJustify="space-between" igxLayoutItemAlign="flex-start">
       <igx-pie-chart #chart [dataSource]="dataSource" width="400px" height="400px"
         labelMemberPath="{{ labelMemberPath }}" valueMemberPath="totalEvents" [othersCategoryThreshold]="0"
-        allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)">
+        allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)" explodedRadius="1"
+        labelPosition="outsideEnd" radiusFactor="0.8" startAngle="-90">
       </igx-pie-chart>
-      <igx-grid *ngIf="gridData" [data]="gridData" [autoGenerate]="true" width="'400px'"></igx-grid>
+      <igx-grid *ngIf="gridData" [data]="gridData | eventSort" [autoGenerate]="true" width="'400px'"></igx-grid>
     </div>
   </div>
 </div>

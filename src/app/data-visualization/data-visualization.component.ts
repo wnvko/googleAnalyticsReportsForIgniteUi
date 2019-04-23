@@ -32,7 +32,6 @@ export class DataVisualizationComponent implements OnInit {
     this.startDate = range[0];
     this.endDate = range[range.length - 1];
     this.onDateRangeChanged.emit(range);
-    console.log(range);
   }
 
   private setDates() {
@@ -60,6 +59,6 @@ export class DataVisualizationComponent implements OnInit {
   chart_SliceClicked(event) {
     event.sender.explodedSlices.clear();
     event.args.isExploded = true;
-    this.gridData = event.args.dataContext.commands.sort((a, b) => b.totalEvents - a.totalEvents);
+    this.gridData = event.args.dataContext.commands;
   }
 }
