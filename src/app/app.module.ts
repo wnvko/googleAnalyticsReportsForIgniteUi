@@ -10,6 +10,7 @@ import {
   IgxCardModule,
   IgxDatePickerModule,
   IgxGridModule,
+  IgxLayoutModule,
   IgxNavbarModule,
   IgxTabsModule
 } from 'igniteui-angular';
@@ -25,6 +26,7 @@ import { DataService } from './services/data.service';
 import { HomeComponent } from './home/home.component';
 import { DataVisualizationComponent } from './data-visualization/data-visualization.component';
 import { EventsVisualizationComponent } from './events-visualization/events-visualization.component';
+import { EventSortPipe } from './pipes/event-sort.pipe';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,7 @@ import { EventsVisualizationComponent } from './events-visualization/events-visu
     DashboardComponent,
     HomeComponent,
     DataVisualizationComponent,
+    EventSortPipe,
     EventsVisualizationComponent
   ],
   imports: [
@@ -46,6 +49,7 @@ import { EventsVisualizationComponent } from './events-visualization/events-visu
     IgxCardModule,
     IgxDatePickerModule,
     IgxGridModule,
+    IgxLayoutModule,
     IgxNavbarModule,
     IgxPieChartModule,
     IgxTabsModule

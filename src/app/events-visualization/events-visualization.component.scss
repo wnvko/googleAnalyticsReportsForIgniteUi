@@ -10,26 +10,18 @@ $custom-card-theme: igx-card-theme(
 
 .event-card {
     @include igx-css-vars($custom-card-theme);
-    igx-card-header {
+    min-height: 130px;
+    display: grid;
+    .card-content {
         padding: 0;
-        max-height: 128px;
-        min-height: 128px;
+        .image-container {
+            width: fit-content;
+            height: fit-content;
+            margin: 15px;
+            max-height: 100px;
+        }
+        .igx-card-header__tgroup {
+            display: inline-block;
+        }
     }
-}
-
-.image-container {
-    width: 100px;
-    height: 100px;
-}
-
-.image-helper {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-}
-
-img {
-    width: 100%;
-    height: auto;
-    vertical-align: middle;
 }

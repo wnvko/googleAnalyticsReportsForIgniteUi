@@ -1,27 +1,23 @@
-<div class="flex container">
-  <div class="calendar-container">
-    <div class="calendar-header">
-      <igx-card class="calendar-header-card">
-        <igx-card-content>
-          {{startDate.getFullYear()}}
-        </igx-card-content>
-        <igx-card-header>
-          {{formatDateForHeader(startDate)}} - {{formatDateForHeader(endDate)}}
-        </igx-card-header>
-      </igx-card>
-    </div>
-    <div class="calendar">
-      <igx-calendar #calendar selection="range" [value]="[startDate, endDate]" [viewDate]="startDate"
-        (onSelection)="dateRangeChanged($event)"></igx-calendar>
-    </div>
+<div igxLayout igxLayoutJustify="space-around">
+  <div>
+    <igx-card class="calendar-header-card">
+      <igx-card-content>
+        {{startDate.getFullYear()}}
+      </igx-card-content>
+      <igx-card-header>
+        <!-- TODO: Date pipe -->
+        {{formatDateForHeader(startDate)}} - {{formatDateForHeader(endDate)}}
+      </igx-card-header>
+    </igx-card>
+    <igx-calendar #calendar selection="range" [value]="[startDate, endDate]" [viewDate]="startDate"
+      (onSelection)="dateRangeChanged($event)"></igx-calendar>
+    *Select time period to get results
   </div>
-  <div class="data">
-    <div class="flex">
-      <div *ngFor="let item of dataSource" style="margin-left:24px;">
-        <app-events-visualization [item]="item"></app-events-visualization>
-      </div>
+  <div igxLayout igxLayoutDir="column" igxLayoutJustify="space-around">
+    <div igxLayout igxLayoutJustify="space-around" igxLayoutWrap="wrap">
+      <app-events-visualization class="event-container" *ngFor="let item of dataSource | eventSort" [item]="item"></app-events-visualization>
     </div>
-    <div class="flex">
+    <div igxLayout igxLayoutJustify="space-around">
       <igx-pie-chart #chart [dataSource]="dataSource" width="400px" height="400px"
         labelMemberPath="{{ labelMemberPath }}" valueMemberPath="totalEvents" [othersCategoryThreshold]="0"
         allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)">

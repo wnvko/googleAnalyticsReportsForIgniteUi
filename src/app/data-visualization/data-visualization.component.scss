@@ -10,32 +10,15 @@ $custom-card-theme: igx-card-theme(
 
 .calendar-header-card {
     @include igx-css-vars($custom-card-theme);
+    margin: 10px;
+    min-height: 130px;
+    display: grid;
     igx-card-header {
-        padding: 8;
-        max-height: 128px;
-        min-height: 64px;
+        font-size: 24px;
+        padding-top: 0;
     }
 }
 
-.flex {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.container {
-    margin: 50px;
-}
-
-.calendar-container {
-    flex-grow: 1;
-    max-width: 400px;
-}
-
-.data {
-    flex-grow: 2;
-}
-
-igx-card-header {
-    font-size: 24px;
-    padding-top: 0;
+.event-container {
+    margin: 10px;
 }
