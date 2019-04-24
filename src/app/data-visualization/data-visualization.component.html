@@ -6,7 +6,7 @@
       </igx-card-content>
       <igx-card-header>
         <!-- TODO: Date pipe -->
-        {{formatDateForHeader(startDate)}} - {{formatDateForHeader(endDate)}}
+        {{startDate | date: 'MMM d'}} - {{endDate | date: 'MMM d'}}
       </igx-card-header>
     </igx-card>
     <igx-calendar #calendar selection="range" [value]="[startDate, endDate]" [viewDate]="startDate"

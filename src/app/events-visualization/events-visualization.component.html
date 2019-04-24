@@ -1,7 +1,7 @@
 <igx-card class="event-card">
   <igx-card-content igxLayout igxLayoutDir="row" igxLayoutItemAlign="center" class="card-content">
     <img class="image-container" *ngIf="item.imageUrl" src="{{item.imageUrl}}">
-    <div class="igx-card-header__tgroup">
+    <div class="igx-card-header__tgroup" igxLayout igxLayoutDir="column" igxLayoutJustify="end">
       <h6 *ngIf="!item.imageUrl">{{item.name}}</h6>
       <h3>{{item.totalEvents}}</h3>
       <h6>Total events</h6>

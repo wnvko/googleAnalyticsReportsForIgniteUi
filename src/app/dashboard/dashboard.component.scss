@@ -8,7 +8,7 @@ $custom-tabs-theme: igx-tabs-theme(
     $indicator-color: $secondary-color
 );
 
-.tabs-wrapper {
+:host {
     @include igx-css-vars($custom-tabs-theme);
     igx-tabs-group {
         padding: 50px;

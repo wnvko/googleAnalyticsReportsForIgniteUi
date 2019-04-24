@@ -1,15 +1,13 @@
-<div class="tabs-wrapper">
-  <igx-tabs class="custom-tabs" (onTabItemSelected)="loadData($event)">
-    <igx-tabs-group label="FRAMEWORKS">
-      <app-data-visualization #dataVisualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"
-        (onDateRangeChanged)="dateRangeChanged($event)"></app-data-visualization>
-    </igx-tabs-group>
-    <igx-tabs-group label="PROJECT TYPES">
-      <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath">
-      </app-data-visualization>
-    </igx-tabs-group>
-    <igx-tabs-group label="TEMPLATES">
-      <app-data-visualization [dataSource]="templatesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
-    </igx-tabs-group>
-  </igx-tabs>
-</div>
+<igx-tabs (onTabItemSelected)="loadData($event)">
+  <igx-tabs-group label="FRAMEWORKS">
+    <app-data-visualization #dataVisualization [dataSource]="frameworksData" [labelMemberPath]="labelMemberPath"
+      (onDateRangeChanged)="dateRangeChanged($event)"></app-data-visualization>
+  </igx-tabs-group>
+  <igx-tabs-group label="PROJECT TYPES">
+    <app-data-visualization [dataSource]="projectTypesData" [labelMemberPath]="labelMemberPath">
+    </app-data-visualization>
+  </igx-tabs-group>
+  <igx-tabs-group label="TEMPLATES">
+    <app-data-visualization [dataSource]="templatesData" [labelMemberPath]="labelMemberPath"></app-data-visualization>
+  </igx-tabs-group>
+</igx-tabs>

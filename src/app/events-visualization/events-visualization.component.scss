@@ -7,7 +7,6 @@ $custom-card-theme: igx-card-theme(
     $content-text-color: black
 );
 
-
 .event-card {
     @include igx-css-vars($custom-card-theme);
     min-height: 130px;

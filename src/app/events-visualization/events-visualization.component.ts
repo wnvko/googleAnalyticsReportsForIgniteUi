@@ -8,6 +8,4 @@ import { Data } from '../models/index';
 })
 export class EventsVisualizationComponent {
   @Input() item: Data;
-
-  constructor() { }
 }

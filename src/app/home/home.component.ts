@@ -6,5 +6,4 @@ import { Component } from '@angular/core';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  title = 'Welcome to Ignite UI for Angular!';
 }

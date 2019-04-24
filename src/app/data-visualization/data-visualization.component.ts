@@ -25,9 +25,6 @@ export class DataVisualizationComponent implements OnInit {
 
   public gridData: Command[];
 
-  constructor() {
-  }
-
   public dateRangeChanged(range: Date[]) {
     this.startDate = range[0];
     this.endDate = range[range.length - 1];
@@ -45,11 +42,6 @@ export class DataVisualizationComponent implements OnInit {
     this.startDate = firstDayLastMonth;
     this.endDate = lastDayLastMonth;
     this.onDateRangeChanged.emit([this.startDate, this.endDate]);
-  }
-
-  formatDateForHeader(date: Date): string {
-    const options = { month: 'short', day: 'numeric'};
-    return date.toLocaleDateString('en-US', options);
   }
 
   ngOnInit() {
