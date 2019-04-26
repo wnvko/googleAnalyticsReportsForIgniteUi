@@ -50,7 +50,8 @@ export class DataVisualizationComponent implements OnInit {
       firstDayOfCurrentMonth.getDate() - 1);
     this.startDate = firstDayLastMonth;
     this.endDate = lastDayLastMonth;
-    this.dateRangeChanged([this.startDate, this.endDate]);
+    this.dateRange = [this.startDate, this.endDate];
+    this.dateRangeChanged(this.dateRange);
   }
 
   ngOnInit() {

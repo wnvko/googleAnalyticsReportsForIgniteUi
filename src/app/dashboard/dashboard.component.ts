@@ -18,8 +18,14 @@ enum ReportType {
 export class DashboardComponent {
   private VIEW_ID = '174416971';
 
-  @ViewChild('dataVisualization')
-  private dataVisualization: DataVisualizationComponent;
+  @ViewChild('frameworkDataVisualization')
+  private frameworkDataVisualization: DataVisualizationComponent;
+
+  @ViewChild('projectTypeDataVisualization')
+  private projectTypeDataVisualization: DataVisualizationComponent;
+
+  @ViewChild('templatesDataVisualization')
+  private templatesDataVisualization: DataVisualizationComponent;
 
   public loggedIn = false;
   public selected: ReportType;
@@ -71,10 +77,10 @@ export class DashboardComponent {
     switch (this.selected) {
       case ReportType.Frameworks:
         const frameworkNameFilter = (s: string) => s.substring(11);
-        const frameworkNames: {name: string, imageUrl?: string}[] = [
-          {name: 'Angular', imageUrl: './assets/angular.png'},
-          {name: 'jQuery', imageUrl: './assets/JQuery.png'},
-          {name: 'React', imageUrl:'./assets/react.png'}
+        const frameworkNames: { name: string, imageUrl?: string }[] = [
+          { name: 'Angular', imageUrl: './assets/angular.png' },
+          { name: 'jQuery', imageUrl: './assets/JQuery.png' },
+          { name: 'React', imageUrl: './assets/react.png' }
         ];
         const frameworkWizardFilter = 'ga:eventLabel';
         const frameworkEventFilter = 'ga:dimension1';
@@ -82,7 +88,7 @@ export class DashboardComponent {
         break;
       case ReportType.ProjectTypes:
         const projectTypeNameFilter = (s: string) => s.substring(s.indexOf(':') + 2);
-        const projectTypeNames: {name: string, imageUrl?: string}[] = [
+        const projectTypeNames: { name: string, imageUrl?: string }[] = [
           { name: 'Ignite UI Angular Wrappers' },
           { name: 'Ignite UI for Angular' },
           { name: 'Ignite UI for JavaScript React Wrappers' },
@@ -95,7 +101,7 @@ export class DashboardComponent {
         break;
       case ReportType.Templates:
         const templateNameFilter = (s: string) => s.substring(s.indexOf(':') + 2);
-        const templateNames: {name: string, imageUrl?: string}[] = [
+        const templateNames: { name: string, imageUrl?: string }[] = [
           { name: 'empty' },
           { name: 'base' },
           { name: 'Empty Project' },
@@ -112,56 +118,70 @@ export class DashboardComponent {
 
   private generateReportRequestsByType(reportType: ReportType): ReportRequest[] {
     const wizardDimensions: Dimension[] = [
-      {name: 'ga:eventLabel'},
-      {name: 'ga:eventAction'}
+      { name: 'ga:eventLabel' },
+      { name: 'ga:eventAction' }
     ];
+    let dates: Dates[];
     switch (reportType) {
       case ReportType.Frameworks:
+        dates = [
+          this.frameworkDataVisualization.startDate,
+          this.frameworkDataVisualization.endDate
+        ];
         const frameworkFilters: Filter[] = [{
-            dimensionName: 'ga:eventLabel',
-            operator: 'EXACT',
-            expressions: ['Choose framework:']
+          dimensionName: 'ga:eventLabel',
+          operator: 'EXACT',
+          expressions: ['Choose framework:']
         }];
 
         const frameworkEventDimensions: Dimension[] = [
-          {name: 'ga:dimension1'},
-          {name: 'ga:eventCategory'}
+          { name: 'ga:dimension1' },
+          { name: 'ga:eventCategory' }
         ];
 
-        return this.generateReportRequests(frameworkFilters, wizardDimensions, frameworkEventDimensions);
+        return this.generateReportRequests(dates, frameworkFilters, wizardDimensions, frameworkEventDimensions);
       case ReportType.ProjectTypes:
+        dates = [
+          this.projectTypeDataVisualization.startDate,
+          this.projectTypeDataVisualization.endDate
+        ];
         const projectTypeFilters: Filter[] = [{
-            dimensionName: 'ga:eventLabel',
-            operator: 'IN_LIST',
-            expressions: ['Choose the type of project:', 'Choose the type of the project:']
+          dimensionName: 'ga:eventLabel',
+          operator: 'IN_LIST',
+          expressions: ['Choose the type of project:', 'Choose the type of the project:']
         }];
 
         const projectTypeEventDimensions: Dimension[] = [
-          {name: 'ga:dimension2'},
-          {name: 'ga:eventCategory'}
+          { name: 'ga:dimension2' },
+          { name: 'ga:eventCategory' }
         ];
 
-        return this.generateReportRequests(projectTypeFilters, wizardDimensions, projectTypeEventDimensions);
+        return this.generateReportRequests(dates, projectTypeFilters, wizardDimensions, projectTypeEventDimensions);
       case ReportType.Templates:
+        dates = [
+          this.templatesDataVisualization.startDate,
+          this.templatesDataVisualization.endDate
+        ];
         const templatesFilters: Filter[] = [{
           dimensionName: 'ga:eventLabel',
           operator: 'BEGINS_WITH',
           expressions: ['Choose project template:']
         }];
-        return this.generateReportRequests(templatesFilters, wizardDimensions);
+        return this.generateReportRequests(dates, templatesFilters, wizardDimensions);
     }
   }
 
   private generateReportRequests(
+    dates: Date[],
     filters: Filter[],
     wizardDimensions: Dimension[],
     eventDimensions?: Dimension[]): ReportRequest[] {
     const dateRange: DateRange = {
-      startDate: this.dataVisualization.startDate.toISOString().substring(0, 10),
-      endDate: this.dataVisualization.endDate.toISOString().substring(0, 10)
+      startDate: dates[0].toISOString().substring(0, 10),
+      endDate: dates[1].toISOString().substring(0, 10)
     };
-    const metrics: Metric[] = [{expression: 'ga:totalEvents'}];
-    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{filters}];
+    const metrics: Metric[] = [{ expression: 'ga:totalEvents' }];
+    const dimensionFilterClausesForWizard: DimensionFilterClause[] = [{ filters }];
     const reportRequestForWizard: ReportRequest = {
       viewId: this.VIEW_ID,
       dateRanges: [dateRange],
@@ -186,7 +206,7 @@ export class DashboardComponent {
 
   private getData = (
     reports,
-    names: {name: string, imageUrl?: string}[],
+    names: { name: string, imageUrl?: string }[],
     nameFilter: (s: string) => string,
     wizardFilter: string,
     eventFilter?: string): Data[] => {
@@ -203,7 +223,7 @@ export class DashboardComponent {
     return data;
   }
 
-  private initializeData(items: {name: string, imageUrl?: string}[]): Data[] {
+  private initializeData(items: { name: string, imageUrl?: string }[]): Data[] {
     const data: Data[] = [];
     for (const item of items) {
       data.push({

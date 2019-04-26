@@ -8,6 +8,9 @@ $custom-card-theme: igx-card-theme(
     $content-text-color: white
 );
 
+.calendar-container {
+    min-width: 450px;
+}
 .calendar-header-card {
     @include igx-css-vars($custom-card-theme);
     margin: 10px;

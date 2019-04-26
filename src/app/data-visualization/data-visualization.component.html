@@ -1,12 +1,12 @@
 <div igxLayout igxLayoutJustify="space-around">
-  <div>
+  <div class="calendar-container">
     <igx-card class="calendar-header-card">
       <igx-card-content>
         {{startDate.getFullYear()}}
       </igx-card-content>
       <igx-card-header>
         <!-- TODO: Date pipe -->
-        {{startDate | date: 'MMM d'}} - {{(endDate !== null) ? (endDate | date: 'MMM d') : 'Select end date'}}
+        {{startDate | date: 'MMM d'}} - {{(endDate !== null) ? (endDate | date: 'MMM d') : 'Last date'}}
       </igx-card-header>
     </igx-card>
     <igx-calendar #calendar selection="range" [value]="dateRange" [viewDate]="startDate"
