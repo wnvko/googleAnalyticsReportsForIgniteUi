@@ -12,6 +12,7 @@ import {
   IgxGridModule,
   IgxLayoutModule,
   IgxNavbarModule,
+  IgxProgressBarModule,
   IgxTabsModule
 } from 'igniteui-angular';
 import { IgxPieChartModule} from 'igniteui-angular-charts/ES5/igx-pie-chart-module';
@@ -52,6 +53,7 @@ import { EventSortPipe } from './pipes/event-sort.pipe';
     IgxLayoutModule,
     IgxNavbarModule,
     IgxPieChartModule,
+    IgxProgressBarModule,
     IgxTabsModule
   ],
   providers: [ AuthService, DataService ],

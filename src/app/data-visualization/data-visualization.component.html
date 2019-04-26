@@ -6,14 +6,17 @@
       </igx-card-content>
       <igx-card-header>
         <!-- TODO: Date pipe -->
-        {{startDate | date: 'MMM d'}} - {{endDate | date: 'MMM d'}}
+        {{startDate | date: 'MMM d'}} - {{(endDate !== null) ? (endDate | date: 'MMM d') : 'Select end date'}}
       </igx-card-header>
     </igx-card>
-    <igx-calendar #calendar selection="range" [value]="[startDate, endDate]" [viewDate]="startDate"
+    <igx-calendar #calendar selection="range" [value]="dateRange" [viewDate]="startDate"
       (onSelection)="dateRangeChanged($event)"></igx-calendar>
     *Select time period to get results
   </div>
-  <div igxLayout igxLayoutDir="column" igxLayoutJustify="space-around">
+  <div *ngIf="!dataSource">
+    <igx-circular-bar [animate]="false" [indeterminate]="true" [textVisibility]="false"></igx-circular-bar>
+  </div>
+  <div *ngIf="dataSource" igxLayout igxLayoutDir="column" igxLayoutJustify="space-around">
     <div igxLayout igxLayoutJustify="space-around" igxLayoutWrap="wrap">
       <app-events-visualization class="event-container" *ngFor="let item of dataSource | eventSort" [item]="item">
       </app-events-visualization>
@@ -21,8 +24,8 @@
     <div igxLayout igxLayoutJustify="space-between" igxLayoutItemAlign="flex-start">
       <igx-pie-chart #chart [dataSource]="dataSource" width="400px" height="400px"
         labelMemberPath="{{ labelMemberPath }}" valueMemberPath="totalEvents" [othersCategoryThreshold]="0"
-        allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)" explodedRadius="1"
-        labelPosition="outsideEnd" radiusFactor="0.8" startAngle="-90">
+        allowSliceExplosion="true" (sliceClick)="chart_SliceClicked($event)" labelPosition="outsideEnd"
+        radiusFactor="0.8" startAngle="-90">
       </igx-pie-chart>
       <igx-grid *ngIf="gridData" [data]="gridData | eventSort" [autoGenerate]="true" width="'400px'"></igx-grid>
     </div>

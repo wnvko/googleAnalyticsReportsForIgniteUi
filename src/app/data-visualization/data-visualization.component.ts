@@ -23,10 +23,19 @@ export class DataVisualizationComponent implements OnInit {
   @Input()
   public endDate: Date;
 
+  @Input()
+  public dateRange: Date[];
+
   public gridData: Command[];
 
   public dateRangeChanged(range: Date[]) {
+    this.dateRange = range;
     this.startDate = range[0];
+    this.endDate = null;
+    this.dataSource = null;
+    if (range.length < 2) {
+      return;
+    }
     this.endDate = range[range.length - 1];
     this.onDateRangeChanged.emit(range);
   }
@@ -41,7 +50,7 @@ export class DataVisualizationComponent implements OnInit {
       firstDayOfCurrentMonth.getDate() - 1);
     this.startDate = firstDayLastMonth;
     this.endDate = lastDayLastMonth;
-    this.onDateRangeChanged.emit([this.startDate, this.endDate]);
+    this.dateRangeChanged([this.startDate, this.endDate]);
   }
 
   ngOnInit() {
@@ -49,8 +58,9 @@ export class DataVisualizationComponent implements OnInit {
   }
 
   chart_SliceClicked(event) {
+    const exploded = event.args.isExploded;
     event.sender.explodedSlices.clear();
-    event.args.isExploded = true;
-    this.gridData = event.args.dataContext.commands;
+    event.args.isExploded = !exploded;
+    this.gridData = event.args.isExploded ? event.args.dataContext.commands : null;
   }
 }

@@ -40,16 +40,19 @@ export class DashboardComponent {
   /**
    * Loads data from Google Analytics
    */
-  public loadData(event?) {
-    if (event) {
-      const oldSelected = this.selected;
-      this.selected = event.group.label.toLowerCase();
-      if (oldSelected === this.selected) {
-        return;
-      }
-    }
+  public loadData() {
     const reportRequests = this.generateReportRequestsByType(this.selected as ReportType);
     this.dataLoadService.loadData(reportRequests);
+  }
+
+  tabItemSelected(event) {
+    const oldSelected = this.selected;
+    this.selected = event.group.label.toLowerCase();
+    if (oldSelected === this.selected) {
+      return;
+    }
+
+    this.loadData();
   }
 
   private dateRangeChanged(range: Date[]) {
